@@ -1,21 +1,29 @@
-This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car: Carla. This project focuses on system integration using ROS. The ROS framework is set to either communicate with Carla or a [Unity Simulator](https://github.com/udacity/CarND-Capstone/releases). This repo uses [Udacity's CarND-Capstone repo](https://github.com/udacity/CarND-Capstone) as a base template and guidance.
 
-Please use **one** of the two installation options, either native **or** docker installation.
+## OS and ROS Installation 
+Please use **one** of the two following installation options: "Native or Virtual"
+### Native or Virtual Installation
+Because ROS is used, you will need to use Ubuntu locally or through a VM to develop and test your project code. You may use
 
-### Native Installation
+- [Ubuntu 14.04 Trusty Tahir](https://releases.ubuntu.com/trusty/) with [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)
+- [Ubuntu 16.04 Xenial Xerus](https://releases.ubuntu.com/xenial/) with [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
 
-* Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
-* If using a Virtual Machine to install Ubuntu, use the following configuration as minimum:
-  * 2 CPU
-  * 2 GB system memory
-  * 25 GB of free hard drive space
+You are welcome to install everything manually or use this [pre-built (recommmended) OS image]() of Ubuntu with ROS and Dataspeed DBW already installed (warning: it is almost 5GB). Once the image has been downloaded, open terminal and navigate to directory containing the compressed image to execute `$ unzip Udacity_VM_Base_V1.0.0.zip`
 
-  The Udacity provided virtual machine has ROS and Dataspeed DBW already installed, so you can skip the next two steps if you are using this.
+In either way: manual or pre-built, if using [VirtualBox](https://www.virtualbox.org/wiki/Downloads) as your Virtual Machine:
+- Open VirtualBox Application.
+- Click File > Import Appliance..
+- Click the folder icon on the right and navigate to your unzipped image (the .ovf file).
+- Follow the prompts to import the image.
+- Before getting your VM up and running, navigate to the VM settings by clicking on the icon in the VirtualBox Manager. In the "System" cateogory Look for tabs labeled "Motherboard" and "Processor." Use the following configuration as minimum:
+  - 2 CPU
+  - 2 GB system memory
+  - 25 GB of free hard drive space
+- From the VirtualBox Manager, select your VM and press start.
 
-* Follow these instructions to install ROS
-  * [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) if you have Ubuntu 16.04.
-  * [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) if you have Ubuntu 14.04.
-* Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases).
+Upon your first boot you will be prompted to choose a keyboard layout of your choice. Once you select a keyboard you will not be prompted for this again. If you would like to change your option you can reset this feature by entering `udacity_reset` in a terminal of your choice and restarting the VM.
+
+Once you are up and running, you might be asked to input a password to enter the VM. The password for the VM is `udacity-nd`
 
 ### Docker Installation
 [Install Docker](https://docs.docker.com/engine/installation/)
@@ -29,6 +37,28 @@ Run the docker file
 ```bash
 docker run -p 4567:4567 -v $PWD:/capstone -v /tmp/log:/root/.ros/ --rm -it capstone
 ```
+
+## Simulator
+
+* Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases).
+
+The simulator has two test tracks:
+- A highway test track with traffic lights
+- A testing lot test track similar to where we will run Carla
+
+the simulator displays vehicle velocity in units of mph. However, all values used within the project code are use the metric system (m or m/s), including current velocity data coming from the simulator.
+
+To use the second test lot, you will need to update your code to specify a new set of waypoints. We'll discuss how to do this in a later lesson. Additionally, the first track has a toggle button for camera data. Many students have experienced latency when running the simulator together with a virtual machine, and leaving the camera data off as you develop the car's controllers will help with this issue.
+
+
+Test Lot
+The CarND-Capstone/ros/src/waypoint_loader/launch/waypoint_loader.launch file is set up to load the waypoints for the first track. To test using the second track, you will need to change
+
+<param name="path" value="$(find styx)../../../data/wp_yaw_const.csv" />
+to use the churchlot_with_cars.csv as follows:
+
+<param name="path" value="$(find styx)../../../data/churchlot_with_cars.csv"/>
+Note that the second track does not send any camera data.
 
 ### Port Forwarding
 To set up port forwarding, please refer to the "uWebSocketIO Starter Guide" found in the classroom (see Extended Kalman Filter Project lesson).
@@ -53,6 +83,11 @@ source devel/setup.sh
 roslaunch launch/styx.launch
 ```
 4. Run the simulator
+
+## System Architecture
+
+
+
 
 ### Real world testing
 1. Download [training bag](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/traffic_light_bag_file.zip) that was recorded on the Udacity self-driving car.
@@ -86,3 +121,26 @@ Specific to these libraries, the simulator grader and Carla use the following:
 | OpenMP | N/A | N/A |
 
 We are working on a fix to line up the OpenCV versions between the two.
+
+
+Carla will navigate the test track using waypoint navigation which will be generated based on the upcoming obtacles and traffic lights.
+each waypoint has an associatted target velocity.
+
+
+Troubleshooting Tips
+Keyboard Mappings: Use of certain keyboards can create issues unless the corresponding keyboard has been set in the VM. This is due to keyboard mappings. A frequent issue is special characters in passwords not being entered correctly when logging in. An example useage for VirtualBox is setting up an Italian keyboard. To do this, execute the following in a terminal localectl set-keymap it; localectl set-x11-keymap it.
+
+roscore ip: If the host network interface has multiple addresses (ex: ipv6 enabled) roscore will fail since hostname -I returns multiple ip, resulting into a invalid URL. One solution to this is to replace this line in .bashrc, export ROS_IP=`echo $( hostname -I)' , with this export ROS_IP=$( hostname -I | awk '{print $1}').
+
+
+
+Final waypoints which will be publishing to waypoint follower, a piece of code from autoware, runs at 30Hz so you can go as low as 30Hz with your ROS code.
+
+Important:
+dbw_node.py is currently set up to publish steering, throttle, and brake commands at 50hz. The DBW system on Carla expects messages at this frequency, and will disengage (reverting control back to the driver) if control messages are published at less than 10hz. This is a safety feature on the car intended to return control to the driver if the software system crashes. You are welcome to modify how the dbw_node.py code is structured, but please ensure that control commands are published at 50hz.
+
+Additionally, although the simulator displays speed in mph, all units in the project code use the metric system, including the units of messages in the /current_velocity topic (which have linear velocity in m/s).
+
+Finally, Carla has an automatic transmission, which means the car will roll forward if no brake and no throttle is applied. To prevent Carla from moving requires about 700 Nm of torque.
+
+0.1 m/s is the lowest speed of the car
