@@ -132,10 +132,38 @@ Keyboard Mappings: Use of certain keyboards can create issues unless the corresp
 
 roscore ip: If the host network interface has multiple addresses (ex: ipv6 enabled) roscore will fail since hostname -I returns multiple ip, resulting into a invalid URL. One solution to this is to replace this line in .bashrc, export ROS_IP=`echo $( hostname -I)' , with this export ROS_IP=$( hostname -I | awk '{print $1}').
 
+------
+The eventual purpose of this node is to publish a fixed number of waypoints ahead of the vehicle with the correct target velocities, depending on traffic lights and obstacles. The goal for the first version of the node should be simply to subscribe to the topics
 
+/base_waypoints
+/current_pose
+and publish a list of waypoints to
+
+/final_waypoints
 
 Final waypoints which will be publishing to waypoint follower, a piece of code from autoware, runs at 30Hz so you can go as low as 30Hz with your ROS code.
 
+Once messages are being published to /final_waypoints, the vehicle's waypoint follower will publish twist commands to the /twist_cmd topic. The goal for this part of the project is to implement the drive-by-wire node (dbw_node.py) which will subscribe to /twist_cmd and use various controllers to provide appropriate throttle, brake, and steering commands. These commands can then be published to the following topics:
+
+/vehicle/throttle_cmd
+/vehicle/brake_cmd
+/vehicle/steering_cmd
+
+Once the vehicle is able to process waypoints, generate steering and throttle commands, and traverse the course, it will also need stop for obstacles. Traffic lights are the first obstacle that we'll focus on.
+
+The traffic light detection node (tl_detector.py) subscribes to four topics:
+
+/base_waypoints provides the complete list of waypoints for the course.
+/current_pose can be used to determine the vehicle's location.
+/image_color which provides an image stream from the car's camera. These images are used to determine the color of upcoming traffic lights.
+/vehicle/traffic_lights provides the (x, y, z) coordinates of all traffic lights.
+The node should publish the index of the waypoint for nearest upcoming red light's stop line to a single topic:
+
+/traffic_waypoint
+
+Once traffic light detection is working properly, you can incorporate the traffic light data into your waypoint updater node. To do this, you will need to add a subscriber for the /traffic_waypoint topic and implement the traffic_cb callback for this subscriber.
+
+------------------
 Important:
 dbw_node.py is currently set up to publish steering, throttle, and brake commands at 50hz. The DBW system on Carla expects messages at this frequency, and will disengage (reverting control back to the driver) if control messages are published at less than 10hz. This is a safety feature on the car intended to return control to the driver if the software system crashes. You are welcome to modify how the dbw_node.py code is structured, but please ensure that control commands are published at 50hz.
 
@@ -144,3 +172,4 @@ Additionally, although the simulator displays speed in mph, all units in the pro
 Finally, Carla has an automatic transmission, which means the car will roll forward if no brake and no throttle is applied. To prevent Carla from moving requires about 700 Nm of torque.
 
 0.1 m/s is the lowest speed of the car
+
