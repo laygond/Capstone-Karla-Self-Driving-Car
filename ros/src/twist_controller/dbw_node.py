@@ -81,30 +81,51 @@ class DBWNode(object):
         self.loop() 
 
     def loop(self):
+        """
+        This Node's Main Loop: It runs forever at 50Hz until ROS is shutdown. 
+        """
         rate = rospy.Rate(50) # 50Hz
         while not rospy.is_shutdown():
-            # TODO: Get predicted throttle, brake, and steering using twist controller'
-            # You should only publish the control commands if dbw is enabled
+            # TODO: Implement
+            # Corrects/Updates throttle, brake, and steering using predictions from twist controller.
             if not None in (self.current_vel, self.linear_vel, self.angular_vel):
                 self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
                                                                                 self.dbw_enabled,
                                                                                 self.linear_vel,
                                                                                 self.angular_vel) 
+            # Publish if car is in autonomous mode.
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)
             rate.sleep() 
     
     def dbw_enabled_cb(self, msg):
+        """
+        Callback function from subscribing to '/vehicle/dbw_enabled' topic.
+        It stores the car's DBW status to know whether a car is in autonomous(True)
+        or manual mode(False). 
+        """
         self.dbw_enabled = msg
 
     def twist_cb(self, msg):
+        """
+        Callback function from subscribing to '/twist_cmd' topic.
+        It stores the car's Target linear and angular velocities
+        """
         self.linear_vel  = msg.twist.linear.x
         self.angular_vel = msg.twist.angular.z
 
     def velocity_cb(self, msg):
+        """
+        Callback function from subscribing to '/current_velocity' topic.
+        It stores the car's current velocity seen from the cars reference,
+        i.e., just forward velocity.
+        """
         self.current_vel = msg.twist.linear.x 
 
     def publish(self, throttle, brake, steer):
+        """
+        Publishes all actuator values
+        """
         tcmd = ThrottleCmd()
         tcmd.enable = True
         tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
