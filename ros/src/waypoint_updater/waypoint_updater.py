@@ -98,7 +98,7 @@ class WaypointUpdater(object):
         lane - Lane() 
         closest_idx = self.get_closest_waypoint_idx()
         farthest_idx = closest_idx + LOOKAHEADWPS
-        roi_waypoints = self.base_waypoints.waypoints[closest idx:farthest_idx]
+        roi_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
         
         if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
             lane.waypoints = roi_waypoints
