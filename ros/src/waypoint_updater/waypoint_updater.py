@@ -39,9 +39,9 @@ class WaypointUpdater(object):
         # TODO: Add other member variables you need below
         self.stopline_wp_idx = -1
         self.pose = None
-        self.base_waypoints = None
-        self.waypoints_2d = None
-        self.waypoint_tree = None 
+        self.base_waypoints = None      # base waypoints are the course map
+        self.waypoints_2d = None        # base waypoints in (x,y) coordinates format 
+        self.waypoint_tree = None       # base waypoints in KD tree format
         
         self.loop() 
 
@@ -90,8 +90,9 @@ class WaypointUpdater(object):
         Publishes as a Lane msg type the subset to final_waypoints topic.
         """
         lane = Lane()
-        lane.header = self.base_waypoints.header
-        lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
+        lane.header  = self.base_waypoints.header
+        farthest_idx = closest_idx + LOOKAHEAD_WPS
+        lane.waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
         self.final_waypoints_pub.publish(lane) 
 
     def generate_lane(sef):
