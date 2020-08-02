@@ -60,7 +60,7 @@ class WaypointUpdater(object):
                 self.publish_waypoints(closest_waypoint_idx)
             rate.sleep() 
 
-    def get_closest_waypoint_id(self):
+    def get_closest_waypoint_idx(self):
         """
         Gets the closest waypoint index in front of the current car's pose. 
         To determine if the closest waypoint is in front, a dot product is used as verification
@@ -128,7 +128,6 @@ class WaypointUpdater(object):
         """
         # TODO: Implement
         self.pose = msg
-        pass
 
     def waypoints_cb(self, waypoints):
         """
