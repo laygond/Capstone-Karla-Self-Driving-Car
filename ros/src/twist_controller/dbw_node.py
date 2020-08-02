@@ -71,18 +71,19 @@ class DBWNode(object):
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
                 
-        self.current_vel = None
+        self.current_vel  = None
         self.curr_ang_vel = None
-        self.dbw_enabled = None
-        self.linear_vel = None
-        self.angular_vel = None
+        self.dbw_enabled  = None
+        self.linear_vel   = None
+        self.angular_vel  = None
         self.throttle = self.steering = self.brake = 0
 
         self.loop() 
 
     def loop(self):
         """
-        This Node's Main Loop: It runs forever at 50Hz until ROS is shutdown. 
+        This Node's Main Loop: It runs forever at 50Hz until ROS is shutdown.
+        Publishes updated throttle, brake, and steering if car is in autonomous mode. 
         """
         rate = rospy.Rate(50) # 50Hz
         while not rospy.is_shutdown():
