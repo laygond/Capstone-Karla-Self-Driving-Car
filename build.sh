@@ -18,8 +18,6 @@ fi
 
 echo [INFO] Compiling new code
 catkin_make
-source devel/setup.sh
+source devel/setup.bash
 
 cd $DIR
-
-#roslaunch launch/styx.launch
